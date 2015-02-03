@@ -159,8 +159,16 @@ Events.Pan = function(container, options) {
       delta: delta,
       position: _.clone(last.position),
       velocity: {
-        x: (delta.x / delta.time)/10,
-        y: (delta.y / delta.time)/10
+        // Average of velocity x
+        x: _.reduce(history, function(memo, val) {
+          return memo + val.velocity.x;
+        }, 0) / history.length,
+        // Average of velocity y
+        y: _.reduce(history, function(memo, val) {
+          return memo + val.velocity.y;
+        }, 0) / history.length,
+        // x: (delta.x / delta.time)/10,
+        // y: (delta.y / delta.time)/10
       },
       time: currentTime,
       releaseTime: dtime
