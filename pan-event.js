@@ -11,7 +11,8 @@ Events.Pan = function(container, options) {
   options = _.extend({
     historyLength: 20, // History length
     minimumTime: 8, // Time diff will never be 0
-    passthrough: false
+    passthrough: false,
+    moveTreshold: 3 // Threshold before working with this as a scroll
   }, options);
 
   // Initialize our internal event handler
@@ -34,12 +35,17 @@ Events.Pan = function(container, options) {
     return history.length ? history[history.length-1] : {};
   };
 
+  var inScroll = false;
+
   // Touch start handle
   var touchStart = function(evt) {
-    if (!options.passthrough) evt.preventDefault();
+    if (inScroll) evt.preventDefault();
 
     // Get current touch
     var touch = evt.targetTouches[0];
+
+    // Reset in scroll flag
+    inScroll = false;
 
     // Keep track of time
     currentTime = +new Date();
@@ -75,7 +81,7 @@ Events.Pan = function(container, options) {
 
 
   var touchMove = function(evt) {
-    if (!options.passthrough) evt.preventDefault();
+    if (inScroll) evt.preventDefault();
     // Get touch
     var touch = evt.targetTouches[0];
 
@@ -91,6 +97,18 @@ Events.Pan = function(container, options) {
       y: touch.pageY - last.position.y,
       time: Math.max(currentTime - last.time, options.minimumTime)
     };
+
+    // Calc moved distance
+    var dist = Math.sqrt(delta.x*delta.x + delta.y*delta.y);
+
+    // Check if this is a move
+    if (!options.passthrough && !inScroll && dist > options.moveTreshold) {
+      // Set in scroll flag true
+      inScroll = true;
+
+      // Prevent default
+      evt.preventDefault();
+    }
 
     var e = {
       delta: delta,
@@ -120,7 +138,7 @@ Events.Pan = function(container, options) {
 
 
   var touchEnd = function(evt) {
-    if (!options.passthrough) evt.preventDefault();
+    if (inScroll) evt.preventDefault();
 
     // Update current time
     currentTime = +new Date();
@@ -147,6 +165,9 @@ Events.Pan = function(container, options) {
       time: currentTime,
       releaseTime: dtime
     };
+
+    // Reset in scroll flag
+    inScroll = false;
 
     // Emit end event
     _eventEmitter.emit('end', e);
