@@ -7,13 +7,19 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-  api.export('Events');
+  api.versionsFrom('1.2');
 
   api.use([
+    // core
+    'underscore',
+
+    // atmosphere
     'raix:eventemitter@0.1.1' // XXX: Use jQuery event handling
   ], 'web');
 
   api.addFiles([
     'pan-event.js'
   ], 'web');
+
+  api.export('Events');
 });
