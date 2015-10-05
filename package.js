@@ -1,6 +1,6 @@
 Package.describe({
   name: 'dispatch:events-pan',
-  version: '0.0.3',
+  version: '0.0.4',
   summary: 'Touch event listener and pan event emitter',
   git: 'https://github.com/DispatchMe/meteor-events-pan.git'
 
